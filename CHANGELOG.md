@@ -1,5 +1,31 @@
 # Changelog
 
+## [2.0.0] - 2026-08-20
+
+### Breaking
+
+- `latitude` y `longitude` pasan de `string` a `number` en el objeto `City`.
+- Renombrados en `City`: `city` → `name`, `cityCode` → `ineCode` (código INE de 5 dígitos, provincia + municipio).
+- Eliminados de `City`: `countryCode`, `provinceCode`, `communityCode`. No tienen equivalente directo — el paquete cubre solo España y los códigos de provincia/comunidad no se exponían de forma útil por sí solos.
+- Eliminado el campo `language` (idiomas cooficiales por ciudad). No tenía un caso de uso confirmado; se podrá reintroducir en el futuro si hace falta.
+- Eliminada la función `getAllCitiesFromCommunity`. Cada `City` incluye ahora `community` directamente, así que el equivalente es filtrar tú mismo: `getAllCities().filter(c => c.community === 'Andalucía')`. También puedes filtrar por provincia con la nueva `getCitiesByProvince`.
+- `getCitiesInRange` ya no incluye la ciudad de referencia en su propio resultado (antes se incluía a sí misma, con distancia 0).
+- `getCityByName` y `getCitiesInRange` devuelven `[]` en vez de `undefined`/`null` cuando no hay resultados.
+- El paquete pasa de exportación `export =` (CommonJS) a exports nombrados. Si usabas `import cities = require('spanish-cities-info')`, ahora usa `import { getAllCities, getCitiesInRange, ... } from 'spanish-cities-info'`.
+- El formato interno de `data/cities.json` cambia de un array plano de objetos a un objeto agrupado por provincia con arrays de tuplas `[nombre, códigoINE, lat, lon]`. No afecta a quien use las funciones del paquete, pero sí a quien importara ese JSON directamente en vez de pasar por la API.
+
+### Añadido
+
+- `getCitiesByProvince(province)`: todas las ciudades de una provincia.
+- `getProvinces()`: listado de las 52 provincias.
+- El campo `community` (comunidad autónoma) está de nuevo presente en cada `City`. (Durante el desarrollo de esta versión se había perdido al migrar el dataset; en esta versión final está recuperado y verificado — 19 comunidades y ciudades autónomas, derivadas de un lookup provincia→comunidad contrastado con el INE.)
+
+### Corregido
+
+- El dataset se reconcilió contra la fuente oficial del INE (municipios a 01-01-2026): se corrigieron 3 nombres con errores, se añadió el municipio que faltaba (Usansolo, Bizkaia, independizado en 2023) y se eliminaron 6 municipios que estaban duplicados dos veces con distinto nombre bajo el mismo código INE. El dataset queda en exactamente 8.132 municipios, el recuento oficial.
+- **El paquete publicado desde 2024 no era funcional tras instalarlo.** Desde el commit "minimize size package" (jun 2024), `.npmignore` excluía `data/cities.json` del tarball de npm — cualquier instalación fallaba con `Cannot find module` al llamar a cualquier función de la librería. Corregido: los datos ahora se publican dentro de `dist/`.
+- Tamaño del paquete: pasa de ~1,06 MB sin comprimir (v1.0.6) a ~379 KB — por debajo del principal competidor directo (`all-spanish-cities`, ~800 KB).
+
 ## [1.0.6] - 2024-06-14
 - Fallo en la compilación.
 

@@ -1,124 +1,103 @@
 # spanish-cities-info
 
-Esta librería proporciona una lista de ciudades de España, con varias funciones. 
+Listado completo de los municipios de España (8.132, verificado contra el INE) con funciones para consultarlos: buscar por código INE, por nombre, por provincia, listar comunidades autónomas, y encontrar municipios dentro de un radio en km de otro.
 
-## Type city
-```javascript	
+## Tipo `City`
+
+```javascript
 {
-   city: 'Almería',
-   cityCode: '04013',
-   province: 'Almería',
-   community: 'Andalucia',
-   latitude: '36.8381',
-   longitude: '-2.4597',
-   language: [ 'cast' ]
- },
+  name: 'Ferrol',
+  ineCode: '15036',
+  province: 'A Coruña',
+  community: 'Galicia',
+  latitude: 43.5098,
+  longitude: -8.2704
+}
 ```
-## Funcionalidades
-
-- **Obtener todas las ciudades de España:** Puedes obtener una lista completa de todas las ciudades disponibles en España.
-- **Obtener una ciudad por zipCode:** Proporciona la capacidad de buscar una ciudad por su código postal.
-- **Obtener una ciudad por nombre:** Permite buscar una ciudad por su nombre.
-- **Obtener ciudades dentro de un rango:** Te permite encontrar todas las ciudades dentro de un rango específico de una ciudad determinada.
 
 ## Instalación
 
-Puedes instalar esta librearía utilizando npm:
-
-**npm install locationsInfo**
-
+```
+npm install spanish-cities-info
+```
 
 ## Uso
 
 ```javascript
-// Importar el módulo
-import { getAllCities, getCitiesInRange } from 'spanish-cities-info';
+import {
+  getAllCities,
+  getCityByCityCode,
+  getCityByName,
+  getCitiesByProvince,
+  getCitiesInRange,
+  getProvinces,
+} from 'spanish-cities-info';
+```
 
-// Ejemplo de uso para obtener todas las ciudades
-const allcities = getAllCities();
+### `getAllCities()`
 
-// Ejemplo de uso para obtener una ciudad por nombre
-  const citiesInRange = getCitiesInRange('Ferrol', 10);
- [
-  {
-      city: 'Ferrol',
-      cityCode: '15036',
-      province: 'A Coruña',
-      community: 'Galicia',
-      latitude: '43.4832',
-      longitude: '-8.2369',
-      language: [ 'cast', 'ga' ]
-    },
-    {
-      city: 'Fene',
-      cityCode: '15035',
-      province: 'A Coruña',
-      community: 'Galicia',
-      latitude: '43.45',
-      longitude: '-8.15',
-      language: [ 'cast', 'ga' ]
-    },
-    {
-      city: 'Neda',
-      cityCode: '15055',
-      province: 'A Coruña',
-      community: 'Galicia',
-      latitude: '43.4996',
-      longitude: '-8.1594',
-      language: [ 'cast', 'ga' ]
-    },
-    {
-      city: 'Narón',
-      cityCode: '15054',
-      province: 'A Coruña',
-      community: 'Galicia',
-      latitude: '43.5333',
-      longitude: '-8.2167',
-      language: [ 'cast', 'ga' ]
-    },
-    {
-      city: 'Pontedeume',
-      cityCode: '15069',
-      province: 'A Coruña',
-      community: 'Galicia',
-      latitude: '43.4078',
-      longitude: '-8.1721',
-      language: [ 'cast', 'ga' ]
-    },
-    {
-      city: 'Mugardos',
-      cityCode: '15051',
-      province: 'A Coruña',
-      community: 'Galicia',
-      latitude: '43.4604',
-      longitude: '-8.2551',
-      language: [ 'cast', 'ga' ]
-    },
-    {
-      city: 'Ares',
-      cityCode: '15004',
-      province: 'A Coruña',
-      community: 'Galicia',
-      latitude: '43.4244',
-      longitude: '-8.2043',
-      language: [ 'cast', 'ga' ]
-    }
-  ]
+Devuelve los 8.132 municipios, ordenados alfabéticamente por nombre.
+
+```javascript
+getAllCities();
+// [{ name: 'A Baña', ineCode: '15007', province: 'A Coruña', community: 'Galicia', latitude: 42.9634, longitude: -8.7529 }, ...]
+```
+
+### `getCityByCityCode(ineCode)`
+
+Busca un municipio por su código INE (5 dígitos). Devuelve `undefined` si no existe.
+
+```javascript
+getCityByCityCode('15036');
+// { name: 'Ferrol', ineCode: '15036', province: 'A Coruña', community: 'Galicia', latitude: 43.5098, longitude: -8.2704 }
+```
+
+### `getCityByName(name)`
+
+Busca municipios cuyo nombre contenga el texto indicado (no distingue mayúsculas/minúsculas). Devuelve `[]` si no hay coincidencias.
+
+```javascript
+getCityByName('Ferrol');
+// [{ name: 'Ferrol', ineCode: '15036', province: 'A Coruña', community: 'Galicia', latitude: 43.5098, longitude: -8.2704 }]
+```
+
+### `getCitiesByProvince(province)`
+
+Todos los municipios de una provincia. Útil para un select en cascada en un formulario. Devuelve `[]` si la provincia no existe.
+
+```javascript
+getCitiesByProvince('Melilla');
+// [{ name: 'Melilla', ineCode: '52001', province: 'Melilla', community: 'Melilla', latitude: 35.291, longitude: -2.9505 }]
+```
+
+### `getCitiesInRange(referenceCityName, rangeKm)`
+
+Municipios dentro de un radio en km de una ciudad de referencia (no incluye la propia ciudad de referencia). Devuelve `[]` si la ciudad de referencia no existe.
+
+```javascript
+getCitiesInRange('Ferrol', 10).map((c) => c.name);
+// ['Ares', 'Mugardos', 'Narón']
+```
+
+### `getProvinces()`
+
+Listado de las 52 provincias, ordenado alfabéticamente.
+
+```javascript
+getProvinces();
+// ['A Coruña', 'Alacant', 'Albacete', 'Almería', 'Araba', ...]
+```
+
+## Datos
+
+Municipios y códigos INE: [Instituto Nacional de Estadística](https://www.ine.es/daco/daco42/codmun/codmun.htm), a fecha 01-01-2026. Comunidades autónomas: lookup provincia → comunidad verificado contra el INE (19 comunidades y ciudades autónomas).
+
+El INE publica actualizaciones de este listado periódicamente (normalmente cada enero, a veces también en julio). Cuando hay una nueva versión, se descarga el fichero oficial y se compara contra el dataset actual con `scripts/reconcile_ine.py` para detectar altas, bajas y cambios de nombre antes de actualizar el paquete.
 
 ## Contribución
 
-Si encuentras algún error, tienes alguna sugerencia de mejora, 
-o si falta tu ciudad en la lista, 
-¡me encantaría recibir tu contribución! 
-Puedes [crear un issue](https://github.com/ManuelCebreiro/locationsInfo/issues)
-para reportar el problema o 
-[enviar un pull request](https://github.com/ManuelCebreiro/locationsInfo/pulls) 
-con tus cambios.
+Si encuentras algún error en los datos o echas en falta algo, abre un issue.
+Las correcciones de datos se validan contra la fuente oficial del INE
+(`scripts/reconcile_ine.py`) antes de aplicarse.
 
-Para añadir una nueva ciudad:
-1. Asegúrate de tener el código postal, nombre de la ciudad, provincia,
-   comunidad autónoma y sus códigos correspondientes.
-2. Edita el archivo JSON de ciudades y agrega la información de la nueva ciudad.
-3. Envia tu pull request con la nueva información y me encargaré de revisarlo.
-
-¡Esperamos tu contribución!
+Para cambios en el código, [pull requests](https://github.com/ManuelCebreiro/locationsInfo/pulls) bienvenidos.

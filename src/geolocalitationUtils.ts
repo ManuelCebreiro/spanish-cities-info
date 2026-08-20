@@ -7,11 +7,10 @@ export function degreesToRadians(degrees: number): number {
 export function calculateDistance(cityOne: City, cityTwo: City): number {
   // Radio de la Tierra en kilómetros
   const R = 6371;
-  //Convertir latitude y longitud de string a number
-  const lat1 = parseFloat(cityOne.latitude);
-  const lon1 = parseFloat(cityOne.longitude);
-  const lat2 = parseFloat(cityTwo.latitude);
-  const lon2 = parseFloat(cityTwo.longitude);
+  const lat1 = cityOne.latitude;
+  const lon1 = cityOne.longitude;
+  const lat2 = cityTwo.latitude;
+  const lon2 = cityTwo.longitude;
 
   // Convertir grados a radianes
   const lat1Rad = degreesToRadians(lat1);

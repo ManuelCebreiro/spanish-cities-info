@@ -1,11 +1,12 @@
+export interface RawCityData {
+  [province: string]: [string, string, number, number][];
+}
+
 export interface City {
-  countryCode: string;
-  city: string;
-  cityCode: string;
+  name: string;
+  ineCode: string;
   province: string;
-  provinceCode: string;
   community: string;
-  communityCode: string;
-  latitude: string;
-  longitude: string;
+  latitude: number;
+  longitude: number;
 }
