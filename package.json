@@ -1,6 +1,6 @@
 {
   "name": "spanish-cities-info",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "8,132 Spanish municipalities verified against official INE data. Search by name, province, INE code, or radius (km). Modular imports by province/community. TypeScript, ~330KB (gzip: 125KB).",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
