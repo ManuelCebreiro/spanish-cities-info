@@ -63,11 +63,14 @@ getCityByCityCode('15036');
 
 ### `getCityByName(name)`
 
-Busca municipios cuyo nombre contenga el texto indicado (no distingue mayúsculas/minúsculas). Devuelve `[]` si no hay coincidencias.
+Busca municipios cuyo nombre contenga el texto indicado (no distingue mayúsculas/minúsculas ni tildes). Devuelve `[]` si no hay coincidencias.
 
 ```javascript
 getCityByName('Ferrol');
 // [{ name: 'Ferrol', ineCode: '15036', province: 'A Coruña', community: 'Galicia', latitude: 43.5098, longitude: -8.2704 }]
+
+getCityByName('almeria');
+// [{ name: 'Alhama de Almería', ... }, { name: 'Almería', ineCode: '04013', province: 'Almería', community: 'Andalucía', latitude: 36.8757, longitude: -2.3423 }, { name: 'Huércal de Almería', ... }]
 ```
 
 ### `getCitiesByProvince(province)`
@@ -79,13 +82,22 @@ getCitiesByProvince('Melilla');
 // [{ name: 'Melilla', ineCode: '52001', province: 'Melilla', community: 'Melilla', latitude: 35.291, longitude: -2.9505 }]
 ```
 
-### `getCitiesInRange(referenceCityName, rangeKm)`
+### `getCitiesInRange(referenceCity, rangeKm)`
 
 Municipios dentro de un radio en km de una ciudad de referencia (no incluye la propia ciudad de referencia). Devuelve `[]` si la ciudad de referencia no existe.
 
 ```javascript
 getCitiesInRange('Ferrol', 10).map((c) => c.name);
 // ['Ares', 'Mugardos', 'Narón']
+```
+
+`referenceCity` también acepta el código INE de 5 dígitos en vez del nombre, para desambiguar
+entre municipios con el mismo nombre en provincias distintas (ej. "Sada" existe tanto en
+A Coruña como en Navarra):
+
+```javascript
+getCitiesInRange('15036', 10).map((c) => c.name);
+// ['Ares', 'Mugardos', 'Narón'] — equivalente, usando el código INE de Ferrol
 ```
 
 ### `getProvinces()`
@@ -148,4 +160,4 @@ Si encuentras algún error en los datos o echas en falta algo, abre un issue.
 Las correcciones de datos se validan contra la fuente oficial del INE
 (`scripts/reconcile_ine.py`) antes de aplicarse.
 
-Para cambios en el código, [pull requests](https://github.com/ManuelCebreiro/locationsInfo/pulls) bienvenidos.
+Para cambios en el código, [pull requests](https://github.com/ManuelCebreiro/spanish-cities-info/pulls) bienvenidos.

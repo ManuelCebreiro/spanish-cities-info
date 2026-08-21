@@ -1,6 +1,6 @@
 {
   "name": "spanish-cities-info",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "8,132 Spanish municipalities verified against official INE data. Search by name, province, INE code, or radius (km). Modular imports by province/community. TypeScript, ~330KB (gzip: 125KB).",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -46,7 +46,7 @@
   "bugs": {
     "url": "https://github.com/ManuelCebreiro/spanish-cities-info/issues"
   },
-  "homepage": "https://github.com/ManuelCebreiro/spanish-cities-info#readme",
+  "homepage": "https://spanish-cities-info-web.vercel.app",
   "devDependencies": {
     "@types/node": "^20.14.1",
     "typescript": "^5.4.5"
