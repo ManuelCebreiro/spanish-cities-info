@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0] - 2026-08-21
+
+### Añadido
+
+- `getCommunities()`: listado de las 19 comunidades y ciudades autónomas, sin duplicados. El README de la 2.0.0 ya prometía "listar comunidades autónomas" pero la función no existía — corregido.
+- `getCitiesByCommunity(community)`: todos los municipios de una comunidad autónoma, por simetría con `getCitiesByProvince`. Devuelve `[]` si la comunidad no existe.
+
 ## [2.0.0] - 2026-08-20
 
 ### Breaking

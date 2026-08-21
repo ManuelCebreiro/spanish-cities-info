@@ -31,6 +31,8 @@ import {
   getCitiesByProvince,
   getCitiesInRange,
   getProvinces,
+  getCommunities,
+  getCitiesByCommunity,
 } from 'spanish-cities-info';
 ```
 
@@ -86,6 +88,24 @@ Listado de las 52 provincias, ordenado alfabéticamente.
 ```javascript
 getProvinces();
 // ['A Coruña', 'Alacant', 'Albacete', 'Almería', 'Araba', ...]
+```
+
+### `getCommunities()`
+
+Listado de las 19 comunidades y ciudades autónomas, sin duplicados y ordenado alfabéticamente.
+
+```javascript
+getCommunities();
+// ['Andalucía', 'Aragón', 'Asturias', 'Canarias', 'Cantabria', ...]
+```
+
+### `getCitiesByCommunity(community)`
+
+Todos los municipios de una comunidad autónoma. Devuelve `[]` si la comunidad no existe.
+
+```javascript
+getCitiesByCommunity('Melilla');
+// [{ name: 'Melilla', ineCode: '52001', province: 'Melilla', community: 'Melilla', latitude: 35.291, longitude: -2.9505 }]
 ```
 
 ## Datos

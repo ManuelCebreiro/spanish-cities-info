@@ -32,16 +32,23 @@ export function getCityByCityCode(cityCode: string): City | undefined {
   return undefined;
 }
 
+function normalize(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
 /**
  * 2. Mantiene tu antiguo getCityByName
  */
 export function getCityByName(name: string): City[] {
   const results: City[] = [];
-  const search = name.toLowerCase();
+  const search = normalize(name);
 
   for (const province in data) {
     data[province].forEach((m) => {
-      if (m[0].toLowerCase().includes(search)) {
+      if (normalize(m[0]).includes(search)) {
         results.push(mapToCity(m, province));
       }
     });
@@ -68,15 +75,23 @@ export function getCitiesByProvince(province: string): City[] {
   return provinceData ? provinceData.map((m) => mapToCity(m, province)) : [];
 }
 
+const INE_CODE_PATTERN = /^\d{5}$/;
+
 /**
  * 5. Mantiene tu antiguo getCitiesInRange
+ *
+ * `referenceCity` acepta el nombre de la ciudad o, para desambiguar entre
+ * municipios con el mismo nombre en provincias distintas (ej. "Sada" existe
+ * en A Coruña y en Navarra), su código INE de 5 dígitos.
  */
 export function getCitiesInRange(
-  referenceCityName: string,
+  referenceCity: string,
   rangeKm: number,
 ): City[] {
   const all = getAllCities();
-  const ref = all.find((c) => c.name === referenceCityName);
+  const ref = INE_CODE_PATTERN.test(referenceCity)
+    ? getCityByCityCode(referenceCity)
+    : all.find((c) => c.name === referenceCity);
 
   if (!ref) return [];
 
@@ -91,4 +106,30 @@ export function getCitiesInRange(
  */
 export function getProvinces(): string[] {
   return Object.keys(data).sort();
+}
+
+/**
+ * 7. Lista de comunidades y ciudades autónomas, sin duplicados
+ */
+export function getCommunities(): string[] {
+  const communities = new Set(
+    Object.keys(PROVINCE_TO_COMMUNITY).map(
+      (province) => PROVINCE_TO_COMMUNITY[province],
+    ),
+  );
+  return Array.from(communities).sort();
+}
+
+/**
+ * 8. Todas las ciudades de una comunidad autónoma
+ */
+export function getCitiesByCommunity(community: string): City[] {
+  const provinces = Object.keys(PROVINCE_TO_COMMUNITY).filter(
+    (province) => PROVINCE_TO_COMMUNITY[province] === community,
+  );
+  const result: City[] = [];
+  provinces.forEach((province) => {
+    data[province].forEach((m) => result.push(mapToCity(m, province)));
+  });
+  return result;
 }
