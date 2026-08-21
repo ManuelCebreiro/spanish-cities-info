@@ -15,6 +15,13 @@ Listado completo de los municipios de España (8.132, verificado contra el INE) 
 }
 ```
 
+> **`latitude`/`longitude` son el centroide geométrico del término municipal completo**,
+> no el centro urbano ni un punto de referencia histórico. En municipios grandes o de
+> forma irregular pueden quedar a varios km del núcleo de población — verificado hasta
+> ~7,5 km en casos como Murcia, consistente en una muestra de control de 26 municipios
+> contra Wikipedia/geodatos.net. No es un error si al comparar visualmente contra Google
+> Maps el punto no cae exactamente sobre el pueblo.
+
 ## Instalación
 
 ```
