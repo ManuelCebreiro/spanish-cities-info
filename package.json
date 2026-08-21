@@ -1,10 +1,13 @@
 {
   "name": "spanish-cities-info",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "8,132 Spanish municipalities verified against official INE data. Search by name, province, INE code, or radius (km). Modular imports by province/community. TypeScript, ~330KB (gzip: 125KB).",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist","LICENSE"],
+  "files": [
+    "dist",
+    "LICENSE"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -23,13 +26,21 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prebuild": "node scripts/generate-modules.js",
-    "build":"tsc"
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ManuelCebreiro/spanish-cities-info.git"
   },
-  "keywords": ["spain", "spanish-cities", "cities", "provinces", "municipios", "geolocation", "typescript"],
+  "keywords": [
+    "spain",
+    "spanish-cities",
+    "cities",
+    "provinces",
+    "municipios",
+    "geolocation",
+    "typescript"
+  ],
   "author": "Manuel Cebreiro",
   "license": "ISC",
   "bugs": {
