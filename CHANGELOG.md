@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.2.0] - 2026-08-21
+
+### Breaking
+
+- Se añade el campo `exports` en `package.json`, que restringe los subpaths accesibles del paquete a los documentados: `.`, `./provincias/*` y `./comunidades/*`. Antes, sin `exports`, cualquier ruta interna era importable directamente (ej. `require('spanish-cities-info/dist/data/cities.json')`). A partir de esta versión, importar cualquier ruta no listada falla con `ERR_PACKAGE_PATH_NOT_EXPORTED` (verificado). Si dependías de un archivo interno en vez de la API pública, usa las funciones exportadas o los imports modulares documentados.
+
+### Añadido
+
+- Imports modulares por provincia y comunidad autónoma: `spanish-cities-info/provincias/<slug>` y `spanish-cities-info/comunidades/<slug>` (ej. `spanish-cities-info/provincias/lugo`, `spanish-cities-info/comunidades/galicia`). Cada uno exporta `cities: City[]` autocontenido, sin depender del dataset completo, para que un bundler que resuelva ese subpath solo incluya esa zona. Los 52 módulos de provincia y 19 de comunidad se generan en build (`scripts/generate-modules.js`, corre como `prebuild`) a partir de `src/data/cities.json` y `src/data/provinceCommunityMap.json` — no se mantienen a mano.
+- No rompe nada existente: la entrada principal (`import { getAllCities, ... } from 'spanish-cities-info'`) sigue funcionando exactamente igual.
+
 ## [2.1.0] - 2026-08-21
 
 ### Añadido

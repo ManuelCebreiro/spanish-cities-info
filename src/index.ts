@@ -2,23 +2,19 @@ import citiesData from "./data/cities.json";
 import { calculateDistance } from "./geolocalitationUtils";
 import { City, RawCityData } from "./types";
 import { PROVINCE_TO_COMMUNITY } from "./provinceCommunityMap";
+import { mapToCity as mapToCityBase } from "./mapToCity";
 
 const data = citiesData as unknown as RawCityData;
 
-// Función interna auxiliar para transformar el array [0,1,2,3] en objeto City
-// Esto centraliza el cambio y evita errores si el JSON cambia de nuevo.
+// Los módulos generados en provincias/ y comunidades/ usan directamente
+// mapToCityBase (mismo patrón de tuplas). Aquí se envuelve para no tener
+// que pasar `community` en cada llamada, ya que aquí sí tenemos el mapa
+// completo a mano.
 function mapToCity(
   munArray: [string, string, number, number],
   province: string,
 ): City {
-  return {
-    name: munArray[0],
-    ineCode: munArray[1],
-    province: province,
-    community: PROVINCE_TO_COMMUNITY[province],
-    latitude: munArray[2],
-    longitude: munArray[3],
-  };
+  return mapToCityBase(munArray, province, PROVINCE_TO_COMMUNITY[province]);
 }
 
 /**

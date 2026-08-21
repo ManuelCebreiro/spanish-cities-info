@@ -1,26 +1,41 @@
 {
   "name": "spanish-cities-info",
-  "version": "2.1.0",
-  "description": "Information about cities in Spain",
+  "version": "2.2.0",
+  "description": "8,132 Spanish municipalities verified against official INE data. Search by name, province, INE code, or radius (km). Modular imports by province/community. TypeScript, ~330KB (gzip: 125KB).",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": ["dist"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./provincias/*": {
+      "types": "./dist/provincias/*.d.ts",
+      "default": "./dist/provincias/*.js"
+    },
+    "./comunidades/*": {
+      "types": "./dist/comunidades/*.d.ts",
+      "default": "./dist/comunidades/*.js"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "transform": "node scripts/transformData.js",
+    "prebuild": "node scripts/generate-modules.js",
     "build":"tsc"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ManuelCebreiro/locationsInfo.git"
+    "url": "git+https://github.com/ManuelCebreiro/spanish-cities-info.git"
   },
-  "keywords": ["spain","spanish","spanish-cities","spanish-cities-info","cities","provinces","search","range","cities-in-range","España", "ciudades", "informacion","informacion de ciudades de españa","buscar ciudades de españa por rango","buscar ciudades por comunidad"],
+  "keywords": ["spain", "spanish-cities", "cities", "provinces", "municipios", "geolocation", "typescript"],
   "author": "Manuel Cebreiro",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ManuelCebreiro/locationsInfo/issues"
+    "url": "https://github.com/ManuelCebreiro/spanish-cities-info/issues"
   },
-  "homepage": "https://github.com/ManuelCebreiro/locationsInfo#readme",
+  "homepage": "https://github.com/ManuelCebreiro/spanish-cities-info#readme",
   "devDependencies": {
     "@types/node": "^20.14.1",
     "typescript": "^5.4.5"

@@ -108,6 +108,27 @@ getCitiesByCommunity('Melilla');
 // [{ name: 'Melilla', ineCode: '52001', province: 'Melilla', community: 'Melilla', latitude: 35.291, longitude: -2.9505 }]
 ```
 
+## Imports modulares
+
+Si solo necesitas los municipios de una provincia o comunidad autónoma, puedes importar
+directamente esa zona sin cargar el dataset completo (8.132 municipios). Cada import
+modular es autocontenido: un bundler que resuelva `spanish-cities-info/provincias/lugo`
+solo incluye los municipios de Lugo, no el resto de España.
+
+```javascript
+import { cities } from 'spanish-cities-info/provincias/lugo';
+// 67 municipios de Lugo
+
+import { cities } from 'spanish-cities-info/comunidades/galicia';
+// 313 municipios: A Coruña + Lugo + Ourense + Pontevedra
+```
+
+El slug es el nombre de la provincia/comunidad en minúsculas, sin tildes ni `ñ`, con
+espacios sustituidos por guiones — por ejemplo `getProvinces()` devuelve `'A Coruña'`
+y el import correspondiente es `spanish-cities-info/provincias/a-coruna`;
+`getCommunities()` devuelve `'País Vasco'` y su import es
+`spanish-cities-info/comunidades/pais-vasco`.
+
 ## Datos
 
 Municipios y códigos INE: [Instituto Nacional de Estadística](https://www.ine.es/daco/daco42/codmun/codmun.htm), a fecha 01-01-2026. Comunidades autónomas: lookup provincia → comunidad verificado contra el INE (19 comunidades y ciudades autónomas).
