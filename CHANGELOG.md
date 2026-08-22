@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.0] - 2026-08-22
+
+### Añadido
+
+- Campo `island` (opcional) en `City`: presente solo en los 155 municipios de Illes Balears, Las Palmas y Santa Cruz de Tenerife (las 11 islas habitadas: Mallorca, Menorca, Eivissa, Formentera, Gran Canaria, Fuerteventura, Lanzarote, Tenerife, La Palma, La Gomera, El Hierro). En el resto de España la clave no está presente en el objeto (no `null`, no `""`). Fuente: [`codislas.xlsx`](https://www.ine.es/daco/daco42/codmun/26codislas.xlsx) del INE (01-01-2025), cruzado por código INE contra `cities.json` — 155/155 coincidencias. Nombres normalizados al orden natural (`La Gomera`, `El Hierro`) y "Ibiza" → `Eivissa`, por consistencia con el criterio de nombre cooficial ya usado en el resto del dataset.
+- `getCitiesByIsland(island)`: todos los municipios de una isla, por simetría con `getCitiesByCommunity`. Devuelve `[]` si la isla no existe o no tiene municipios.
+
 ## [2.2.0] - 2026-08-21
 
 ### Breaking

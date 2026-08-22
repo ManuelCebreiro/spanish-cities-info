@@ -1,6 +1,6 @@
 # spanish-cities-info
 
-Listado completo de los municipios de España (8.132, verificado contra el INE) con funciones para consultarlos: buscar por código INE, por nombre, por provincia, listar comunidades autónomas, y encontrar municipios dentro de un radio en km de otro.
+Listado completo de los municipios de España (8.132, verificado contra el INE) con funciones para consultarlos: buscar por código INE, por nombre, por provincia, por isla, listar comunidades autónomas, y encontrar municipios dentro de un radio en km de otro.
 
 ## Tipo `City`
 
@@ -14,6 +14,11 @@ Listado completo de los municipios de España (8.132, verificado contra el INE) 
   longitude: -8.2704
 }
 ```
+
+> **`island` es opcional.** Solo está presente en los 155 municipios de Illes Balears,
+> Las Palmas y Santa Cruz de Tenerife (ej. `island: 'Gran Canaria'`). En el resto de
+> España (incluida la España peninsular, Ceuta y Melilla) la clave `island` no existe
+> en el objeto — no es `null` ni `""`.
 
 > **`latitude`/`longitude` son el centroide geométrico del término municipal completo**,
 > no el centro urbano ni un punto de referencia histórico. En municipios grandes o de
@@ -40,6 +45,7 @@ import {
   getProvinces,
   getCommunities,
   getCitiesByCommunity,
+  getCitiesByIsland,
 } from 'spanish-cities-info';
 ```
 
@@ -127,6 +133,21 @@ getCitiesByCommunity('Melilla');
 // [{ name: 'Melilla', ineCode: '52001', province: 'Melilla', community: 'Melilla', latitude: 35.291, longitude: -2.9505 }]
 ```
 
+### `getCitiesByIsland(island)`
+
+Todos los municipios de una isla. Solo aplica a los 155 municipios de Illes Balears, Las
+Palmas y Santa Cruz de Tenerife — el resto de España (incluida la España peninsular,
+Ceuta y Melilla) no tiene este dato, así que su `City.island` es `undefined`. Devuelve
+`[]` si la isla no existe o no tiene municipios.
+
+```javascript
+getCitiesByIsland('Menorca');
+// [{ name: 'Alaior', ineCode: '07002', province: 'Illes Balears', community: 'Illes Balears', island: 'Menorca', latitude: 39.9339, longitude: 4.1403 }, ...]
+```
+
+Islas disponibles: `Mallorca`, `Menorca`, `Eivissa`, `Formentera`, `Gran Canaria`,
+`Fuerteventura`, `Lanzarote`, `Tenerife`, `La Palma`, `La Gomera`, `El Hierro`.
+
 ## Imports modulares
 
 Si solo necesitas los municipios de una provincia o comunidad autónoma, puedes importar
@@ -150,7 +171,7 @@ y el import correspondiente es `spanish-cities-info/provincias/a-coruna`;
 
 ## Datos
 
-Municipios y códigos INE: [Instituto Nacional de Estadística](https://www.ine.es/daco/daco42/codmun/codmun.htm), a fecha 01-01-2026. Comunidades autónomas: lookup provincia → comunidad verificado contra el INE (19 comunidades y ciudades autónomas).
+Municipios y códigos INE: [Instituto Nacional de Estadística](https://www.ine.es/daco/daco42/codmun/codmun.htm), a fecha 01-01-2026. Comunidades autónomas: lookup provincia → comunidad verificado contra el INE (19 comunidades y ciudades autónomas). Islas: [`codislas.xlsx`](https://www.ine.es/daco/daco42/codmun/26codislas.xlsx) del INE, a fecha 01-01-2025 (155 municipios de Illes Balears, Las Palmas y Santa Cruz de Tenerife), cruzado por código INE contra `cities.json`.
 
 El INE publica actualizaciones de este listado periódicamente (normalmente cada enero, a veces también en julio). Cuando hay una nueva versión, se descarga el fichero oficial y se compara contra el dataset actual con `scripts/reconcile_ine.py` para detectar altas, bajas y cambios de nombre antes de actualizar el paquete.
 

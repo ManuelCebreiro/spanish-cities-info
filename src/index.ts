@@ -17,9 +17,6 @@ function mapToCity(
   return mapToCityBase(munArray, province, PROVINCE_TO_COMMUNITY[province]);
 }
 
-/**
- * 1. Mantiene tu antiguo getCityByCityCode
- */
 export function getCityByCityCode(cityCode: string): City | undefined {
   for (const province in data) {
     const found = data[province].find((m) => m[1] === cityCode);
@@ -35,9 +32,6 @@ function normalize(value: string): string {
     .toLowerCase();
 }
 
-/**
- * 2. Mantiene tu antiguo getCityByName
- */
 export function getCityByName(name: string): City[] {
   const results: City[] = [];
   const search = normalize(name);
@@ -52,9 +46,6 @@ export function getCityByName(name: string): City[] {
   return results;
 }
 
-/**
- * 3. Mantiene tu antiguo getAllCities (¡Ahora con 8000!)
- */
 export function getAllCities(): City[] {
   const all: City[] = [];
   for (const province in data) {
@@ -63,9 +54,6 @@ export function getAllCities(): City[] {
   return all.sort((a, b) => a.name.localeCompare(b.name));
 }
 
-/**
- * 4. Nuevo: getCitiesByProvince (Muy útil para formularios)
- */
 export function getCitiesByProvince(province: string): City[] {
   const provinceData = data[province];
   return provinceData ? provinceData.map((m) => mapToCity(m, province)) : [];
@@ -74,8 +62,6 @@ export function getCitiesByProvince(province: string): City[] {
 const INE_CODE_PATTERN = /^\d{5}$/;
 
 /**
- * 5. Mantiene tu antiguo getCitiesInRange
- *
  * `referenceCity` acepta el nombre de la ciudad o, para desambiguar entre
  * municipios con el mismo nombre en provincias distintas (ej. "Sada" existe
  * en A Coruña y en Navarra), su código INE de 5 dígitos.
@@ -97,16 +83,10 @@ export function getCitiesInRange(
   });
 }
 
-/**
- * 6. Lista de provincias (Para el primer paso de un formulario)
- */
 export function getProvinces(): string[] {
   return Object.keys(data).sort();
 }
 
-/**
- * 7. Lista de comunidades y ciudades autónomas, sin duplicados
- */
 export function getCommunities(): string[] {
   const communities = new Set(
     Object.keys(PROVINCE_TO_COMMUNITY).map(
@@ -116,9 +96,6 @@ export function getCommunities(): string[] {
   return Array.from(communities).sort();
 }
 
-/**
- * 8. Todas las ciudades de una comunidad autónoma
- */
 export function getCitiesByCommunity(community: string): City[] {
   const provinces = Object.keys(PROVINCE_TO_COMMUNITY).filter(
     (province) => PROVINCE_TO_COMMUNITY[province] === community,
@@ -127,5 +104,18 @@ export function getCitiesByCommunity(community: string): City[] {
   provinces.forEach((province) => {
     data[province].forEach((m) => result.push(mapToCity(m, province)));
   });
+  return result;
+}
+
+// Solo Illes Balears, Las Palmas y Santa Cruz de Tenerife tienen dato de
+// isla; en el resto de provincias no habrá coincidencias.
+export function getCitiesByIsland(island: string): City[] {
+  const result: City[] = [];
+  for (const province in data) {
+    data[province].forEach((m) => {
+      const city = mapToCity(m, province);
+      if (city.island === island) result.push(city);
+    });
+  }
   return result;
 }

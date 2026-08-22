@@ -7,6 +7,7 @@ export interface City {
   ineCode: string;
   province: string;
   community: string;
+  island?: string;
   latitude: number;
   longitude: number;
 }
