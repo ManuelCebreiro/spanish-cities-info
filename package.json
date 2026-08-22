@@ -1,7 +1,7 @@
 {
   "name": "spanish-cities-info",
-  "version": "2.3.0",
-  "description": "8,132 Spanish municipalities verified against official INE data. Search by name, province, INE code, or radius (km). Modular imports by province/community. TypeScript, ~330KB (gzip: 125KB).",
+  "version": "2.4.0",
+  "description": "8,132 Spanish municipalities verified against official INE data. Search by name, province, INE code, or radius (km). Modular imports by province/community. Postal codes available as an optional separate import. TypeScript, ~330KB (gzip: 125KB) for the main import.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -20,6 +20,10 @@
     "./comunidades/*": {
       "types": "./dist/comunidades/*.d.ts",
       "default": "./dist/comunidades/*.js"
+    },
+    "./postal-codes": {
+      "types": "./dist/postalCodes.d.ts",
+      "default": "./dist/postalCodes.js"
     },
     "./package.json": "./package.json"
   },

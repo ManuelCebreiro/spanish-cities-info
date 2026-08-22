@@ -1,6 +1,6 @@
 # spanish-cities-info
 
-Listado completo de los municipios de España (8.132, verificado contra el INE) con funciones para consultarlos: buscar por código INE, por nombre, por provincia, por isla, listar comunidades autónomas, y encontrar municipios dentro de un radio en km de otro.
+Listado completo de los municipios de España (8.132, verificado contra el INE) con funciones para consultarlos: buscar por código INE, por nombre, por provincia, por isla, listar comunidades autónomas, encontrar municipios dentro de un radio en km de otro, y consultar códigos postales (import opcional, aparte del dataset principal).
 
 ## Tipo `City`
 
@@ -26,6 +26,10 @@ Listado completo de los municipios de España (8.132, verificado contra el INE) 
 > ~7,5 km en casos como Murcia, consistente en una muestra de control de 26 municipios
 > contra Wikipedia/geodatos.net. No es un error si al comparar visualmente contra Google
 > Maps el punto no cae exactamente sobre el pueblo.
+
+> **`City` no incluye códigos postales.** Es un import aparte
+> (`spanish-cities-info/postal-codes`) precisamente para no cargar ese dato en quien no
+> lo necesita — ver la sección [Códigos postales (import opcional)](#códigos-postales-import-opcional).
 
 ## Instalación
 
@@ -169,9 +173,68 @@ y el import correspondiente es `spanish-cities-info/provincias/a-coruna`;
 `getCommunities()` devuelve `'País Vasco'` y su import es
 `spanish-cities-info/comunidades/pais-vasco`.
 
+## Códigos postales (import opcional)
+
+Los códigos postales **no** están en `City` ni en el import principal — viven en su
+propio subpath, igual que los imports por provincia/comunidad. Así, quien no los
+necesita no paga su peso: el mapa completo (8.132 municipios) pesa ~227 KB sin
+comprimir / ~52 KB gzip, frente a los ~330 KB / ~125 KB gzip del import principal. Si
+importas solo `spanish-cities-info`, ese coste no existe en tu bundle.
+
+```javascript
+import { getPostalCodes } from 'spanish-cities-info/postal-codes';
+
+getPostalCodes('15036');
+// ['15401', '15402', '15403', '15404', '15405', '15406', '15590', '15592', '15593', '15594', '15595']
+
+getPostalCodes('00000'); // código INE inexistente
+// []
+```
+
+También expone el mapa completo `ineCode → postalCodes[]`, por si necesitas recorrerlo
+en vez de consultar municipio a municipio:
+
+```javascript
+import { postalCodesByIneCode } from 'spanish-cities-info/postal-codes';
+
+postalCodesByIneCode['15036'];
+// ['15401', '15402', ...]
+```
+
+Si quieres un `City` con sus códigos postales incluidos, combínalos tú mismo — el
+paquete no los devuelve ya fusionados, precisamente para no forzar esa carga a quien no
+lo pide:
+
+```javascript
+import { getCityByCityCode } from 'spanish-cities-info';
+import { getPostalCodes } from 'spanish-cities-info/postal-codes';
+
+const city = { ...getCityByCityCode('15036'), postalCodes: getPostalCodes('15036') };
+```
+
+> **La cobertura puede tener huecos en zonas rurales.** La fuente es el callejero
+> censal del INE, que asocia códigos postales a tramos de vía concretos — si el INE no
+> tiene ningún tramo censado bajo un código INE de municipio, ese código postal
+> simplemente no aparece en la fuente. Esto afecta sobre todo a parroquias y núcleos
+> rurales dispersos dentro de municipios grandes (verificado en una muestra de control:
+> Ferrol y Folgoso do Courel tienen menos CP en este dataset que en agregadores de
+> terceros que cruzan fuentes adicionales). No es un error del paquete ni del dataset
+> origen, es una propiedad conocida de la fuente oficial. Si un municipio no tiene
+> ningún CP conocido, su clave no está presente en `postalCodesByIneCode` y
+> `getPostalCodes` devuelve `[]` — en la práctica, a fecha de esta versión, los 8.132
+> municipios tienen al menos un CP conocido.
+>
+> Algunos códigos postales pertenecen administrativamente a un municipio distinto del
+> que sirven (ej. `28523`, bajo Madrid en este dataset, es en realidad la oficina de
+> Rivas-Vaciamadrid) — son núcleos de población partidos entre términos municipales con
+> cartería asignada de forma no estrictamente administrativa, un fenómeno real y
+> documentado del sistema postal español, no un error de cruce de datos.
+
 ## Datos
 
 Municipios y códigos INE: [Instituto Nacional de Estadística](https://www.ine.es/daco/daco42/codmun/codmun.htm), a fecha 01-01-2026. Comunidades autónomas: lookup provincia → comunidad verificado contra el INE (19 comunidades y ciudades autónomas). Islas: [`codislas.xlsx`](https://www.ine.es/daco/daco42/codmun/26codislas.xlsx) del INE, a fecha 01-01-2025 (155 municipios de Illes Balears, Las Palmas y Santa Cruz de Tenerife), cruzado por código INE contra `cities.json`.
+
+Códigos postales: [`regi-es/ds-codigos-postales-ine-es`](https://github.com/regi-es/ds-codigos-postales-ine-es) (edición callejero 2026-07, diccionario 2026), que a su vez elabora los datos a partir del Callejero del Censo Electoral y el diccionario de municipios, ambos del INE. Cruzado por código INE contra `cities.json` (8.132/8.132 municipios con coincidencia). Se descarta el código `28000` (dato inválido confirmado, no es un CP real de entrega de Correos); el resto de códigos "cross-municipio" (ej. un CP que administrativamente sirve a un municipio distinto del que aparece en el dataset) se conserva tal cual, ver nota más arriba. `regi-es/ds-codigos-postales-ine-es` no es un fork de [`inigoflores/ds-codigos-postales-ine-es`](https://github.com/inigoflores/ds-codigos-postales-ine-es) — es un dataset independiente, mantenido por otra organización, que regenera los datos de ediciones más recientes del INE mientras conserva compatibilidad de formato (mismo CSV) con el proyecto original. Datos derivados del INE, reutilizados conforme a la Ley 37/2007; fuente: sitio web del INE, www.ine.es.
 
 El INE publica actualizaciones de este listado periódicamente (normalmente cada enero, a veces también en julio). Cuando hay una nueva versión, se descarga el fichero oficial y se compara contra el dataset actual con `scripts/reconcile_ine.py` para detectar altas, bajas y cambios de nombre antes de actualizar el paquete.
 

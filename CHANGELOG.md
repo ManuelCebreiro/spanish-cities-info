@@ -1,5 +1,25 @@
 # Changelog
 
+## [2.4.0] - 2026-08-22
+
+### Añadido
+
+- Import opcional `spanish-cities-info/postal-codes`, mismo patrón que `spanish-cities-info/provincias/*` y `spanish-cities-info/comunidades/*`: solo se carga si se importa explícitamente. Expone `getPostalCodes(ineCode): string[]` (códigos postales de un municipio; `[]` si el código INE no existe o no tiene CP conocido) y `postalCodesByIneCode: Record<string, string[]>` (el mapa completo, por si hace falta recorrerlo). **`City` no incluye códigos postales** — el import principal (`.`) no carga este dato ni su peso; quien quiera un `City` con CP lo combina él mismo con spread (`{ ...getCityByCityCode(ineCode), postalCodes: getPostalCodes(ineCode) }`). Se descartó un primer diseño con `postalCodes` como campo de `City`, porque forzaba el mapa completo dentro de `mapToCity` — usado por prácticamente todas las funciones del import principal — subiendo su peso un 40% (128,5 KB → 181,8 KB gzip, medido con esbuild) para todo el mundo, lo tocara o no.
+  - Fuente: [`regi-es/ds-codigos-postales-ine-es`](https://github.com/regi-es/ds-codigos-postales-ine-es) (edición callejero 2026-07, diccionario 2026), derivado del Callejero del Censo Electoral y el diccionario de municipios del INE. No es un fork de [`inigoflores/ds-codigos-postales-ine-es`](https://github.com/inigoflores/ds-codigos-postales-ine-es), es un dataset independiente compatible en formato.
+  - Cruzado por código INE contra `cities.json`: 8.132/8.132 municipios con coincidencia, sin huecos totales.
+  - Se descarta el código `28000` (dato inválido confirmado — no es un CP real de entrega de Correos, 1 ocurrencia eliminada). El resto de códigos "cross-municipio" (ej. `28523` bajo Madrid, que administrativamente sirve a Rivas-Vaciamadrid) se conserva tal cual viene de la fuente — es un fenómeno real del sistema postal español, no un error de cruce.
+  - Ver nota de cobertura en el README: la fuente (callejero censal) puede tener huecos puntuales en parroquias/núcleos rurales dentro de municipios grandes (verificado en Ferrol y Folgoso do Courel).
+
+### Peso (medido con esbuild sobre el import principal, minificado + gzip)
+
+- `.` (import principal): **128,6 KB gzip** — igual que antes de esta versión, sin regresión. `postalCodes.json` no forma parte del grafo de módulos de `index.ts`, así que un bundler no lo incluye salvo que se importe `spanish-cities-info/postal-codes` explícitamente.
+- `spanish-cities-info/postal-codes` (solo si se importa): **52,8 KB gzip** adicionales, aislados.
+- El tarball de npm (`npm install`, disco) sigue incluyendo ambos — ~1 MB unpacked / ~319 KB comprimido — porque el paquete tiene que enviar el JSON para que el subpath funcione. Lo que cambia es qué entra en el bundle de la app según qué se importe, no qué se descarga con `npm install`.
+
+### Sin breaking changes
+
+- Import nuevo y aditivo; `City` no cambia. Verificado con `tsc` + smoke test de instalación real (`npm pack` en carpeta aparte) antes de esta versión.
+
 ## [2.3.0] - 2026-08-22
 
 ### Añadido
