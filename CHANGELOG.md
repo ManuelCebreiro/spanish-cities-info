@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.4.1] - 2026-08-24
+
+### Rendimiento
+
+- `getAllCities()`, `getCityByCityCode()`, `getCityByName()`, `getCitiesByProvince()` y `getCitiesInRange()` ya no recorren, mapean u ordenan las 8.132 tuplas del dataset en cada llamada. Las estructuras derivadas (`City[]` ya mapeado y ordenado, `Map<ineCode, City>`, `Map<province, City[]>`, nombres pre-normalizados para la búsqueda por substring) se calculan una sola vez al cargar el módulo — el dataset es estático, así que ese trabajo no necesitaba repetirse.
+- `getCityByCityCode()` pasa de búsqueda lineal por provincias a `Map.get()` — O(1). `getCitiesInRange()` reutiliza el array ya ordenado en vez de reconstruirlo en cada llamada (antes invocaba a `getAllCities()` internamente).
+- Los imports modulares (`provincias/*`, `comunidades/*`, `postal-codes`) no se tocan: ya eran óptimos por construcción (constantes de módulo calculadas una vez al cargar, no en cada acceso).
+- Medido con `process.hrtime`, 10.000 llamadas por función: `getCitiesInRange` pasa de ~18 ms a ~0,4 ms por llamada (43-46×); `getAllCities`, de ~17,8 ms a ~3 µs (el coste dominante era el `sort` con `localeCompare` sobre 8.132 strings, repetido sin necesidad en cada llamada); `getCityByName`, de ~2,8 ms a ~265 µs (10×). `getCityByCityCode` y `getCitiesByProvince` ya eran rápidas en términos absolutos (microsegundos) — su speedup (49-63×) es real pero irrelevante en la práctica.
+- `getAllCities()` y `getCitiesByProvince()` devuelven una copia superficial del array (protege contra `push`/`sort`/`splice` sobre el resultado), no clonan cada `City` individual — mutar un campo de un objeto devuelto es visible en llamadas futuras, ver comentario en el código.
+
+### Sin breaking changes
+
+- Ninguna firma pública ni comportamiento observable cambia. Verificado comparando el output de las 9 funciones exportadas (incluyendo casos límite: código INE inexistente, provincia/comunidad/isla inexistente, nombre ambiguo, rango negativo) entre esta versión y la anterior — idéntico byte a byte. Repetido también sobre una instalación real (`npm pack` + `npm install` en carpeta aparte).
+
 ## [2.4.0] - 2026-08-22
 
 ### Añadido
