@@ -17,14 +17,6 @@ function mapToCity(
   return mapToCityBase(munArray, province, PROVINCE_TO_COMMUNITY[province]);
 }
 
-export function getCityByCityCode(cityCode: string): City | undefined {
-  for (const province in data) {
-    const found = data[province].find((m) => m[1] === cityCode);
-    if (found) return mapToCity(found, province);
-  }
-  return undefined;
-}
-
 function normalize(value: string): string {
   return value
     .normalize("NFD")
@@ -32,31 +24,64 @@ function normalize(value: string): string {
     .toLowerCase();
 }
 
-export function getCityByName(name: string): City[] {
-  const results: City[] = [];
-  const search = normalize(name);
+// El dataset es estático, así que estas estructuras se calculan una sola
+// vez al cargar el módulo en vez de en cada llamada. `ALL_CITIES` mantiene
+// el orden provincia -> tupla (no alfabético): `getCityByName` depende de
+// ese orden para su resultado.
+const ALL_CITIES: City[] = [];
+const NORMALIZED_NAMES: string[] = [];
+const CITIES_BY_PROVINCE = new Map<string, City[]>();
+const CITY_BY_INE_CODE = new Map<string, City>();
 
-  for (const province in data) {
-    data[province].forEach((m) => {
-      if (normalize(m[0]).includes(search)) {
-        results.push(mapToCity(m, province));
-      }
-    });
+for (const province in data) {
+  const citiesInProvince: City[] = [];
+  data[province].forEach((m) => {
+    const city = mapToCity(m, province);
+    ALL_CITIES.push(city);
+    NORMALIZED_NAMES.push(normalize(city.name));
+    citiesInProvince.push(city);
+    CITY_BY_INE_CODE.set(city.ineCode, city);
+  });
+  CITIES_BY_PROVINCE.set(province, citiesInProvince);
+}
+
+// Copia ordenada alfabéticamente, usada por getAllCities() y
+// getCitiesInRange(). El sort es estable, así que los municipios con el
+// mismo nombre (ej. "Sada", en A Coruña y en Navarra) mantienen entre sí
+// el orden relativo que tienen en `ALL_CITIES`.
+const ALL_CITIES_SORTED: City[] = [...ALL_CITIES].sort((a, b) =>
+  a.name.localeCompare(b.name),
+);
+
+// Los objetos `City` se crean una única vez y se comparten entre
+// `ALL_CITIES_SORTED`, `CITY_BY_INE_CODE` y `CITIES_BY_PROVINCE`. Las
+// funciones devuelven copias superficiales del *array* para que mutarlo
+// (`push`/`sort`/`splice`) no corrompa la caché interna. No clonan cada
+// `City`: mutar un campo de un objeto devuelto sí es visible en llamadas
+// futuras, un riesgo que se acepta porque clonar los 8.132 objetos en cada
+// llamada no compensa frente a ese caso de uso marginal.
+export function getCityByCityCode(cityCode: string): City | undefined {
+  return CITY_BY_INE_CODE.get(cityCode);
+}
+
+export function getCityByName(name: string): City[] {
+  const search = normalize(name);
+  const results: City[] = [];
+  for (let i = 0; i < ALL_CITIES.length; i++) {
+    if (NORMALIZED_NAMES[i].includes(search)) {
+      results.push(ALL_CITIES[i]);
+    }
   }
   return results;
 }
 
 export function getAllCities(): City[] {
-  const all: City[] = [];
-  for (const province in data) {
-    data[province].forEach((m) => all.push(mapToCity(m, province)));
-  }
-  return all.sort((a, b) => a.name.localeCompare(b.name));
+  return [...ALL_CITIES_SORTED];
 }
 
 export function getCitiesByProvince(province: string): City[] {
-  const provinceData = data[province];
-  return provinceData ? provinceData.map((m) => mapToCity(m, province)) : [];
+  const cities = CITIES_BY_PROVINCE.get(province);
+  return cities ? [...cities] : [];
 }
 
 const INE_CODE_PATTERN = /^\d{5}$/;
@@ -70,14 +95,13 @@ export function getCitiesInRange(
   referenceCity: string,
   rangeKm: number,
 ): City[] {
-  const all = getAllCities();
   const ref = INE_CODE_PATTERN.test(referenceCity)
     ? getCityByCityCode(referenceCity)
-    : all.find((c) => c.name === referenceCity);
+    : ALL_CITIES_SORTED.find((c) => c.name === referenceCity);
 
   if (!ref) return [];
 
-  return all.filter((city) => {
+  return ALL_CITIES_SORTED.filter((city) => {
     const dist = calculateDistance(ref, city);
     return dist <= rangeKm && dist > 0;
   });
