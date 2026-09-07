@@ -1,6 +1,6 @@
 {
   "name": "spanish-cities-info",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "description": "8,132 Spanish municipalities verified against official INE data. Search by name, province, INE code, or radius (km). Modular imports by province/community. Postal codes available as an optional separate import. TypeScript, ~330KB (gzip: 125KB) for the main import.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -28,7 +28,8 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "pretest": "npm run build",
+    "test": "node --test",
     "prebuild": "node scripts/generate-modules.js",
     "build": "tsc"
   },

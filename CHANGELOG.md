@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.4.2] - 2026-09-08
+
+### Documentación
+
+- README: se documenta la fuente de `latitude`/`longitude`, que faltaba junto al resto de fuentes citadas en la sección "Datos". Origen: dataset [`georef-spain-municipio`](https://public.opendatasoft.com/explore/dataset/georef-spain-municipio/) ("Municipalities - Spain") de Opendatasoft, licencia CC BY 4.0, con datos de base del Instituto Geográfico Nacional (IGN). Motivado por una revisión externa recibida en la PR de listado del paquete en awesome-spain.
+
+### Testing
+
+- `npm test` dejó de ser un no-op (`echo "Error: no test specified" && exit 1`). Se añade `test/dataset.test.js` con `node:test` (nativo desde Node 18, sin dependencias nuevas), con 4 tests de regresión sobre el dataset compilado real (`dist/index.js`, vía `getAllCities()` — no `src/data/cities.json`, que es la fuente intermedia sin `community`/`island` resueltos): recuento exacto de 8.132 municipios, ausencia de códigos INE duplicados, ausencia de huecos en campos obligatorios (`name`, `ineCode`, `province`, `community`, `latitude`, `longitude`) y formato de 5 dígitos en todos los códigos INE. `pretest` corre `npm run build` automáticamente, así que los tests siempre validan `dist/` recién compilado, no una copia desactualizada.
+  - Verificado que los tests detectan regresiones reales: se inyectó a mano un código INE duplicado en `dist/data/cities.json` compilado y los tests de recuento y duplicados fallaron como se esperaba; restaurado con `npm run build` desde `src/`.
+
+### Sin breaking changes
+
+- Cambios de documentación y tooling de test únicamente. La API pública y el dataset publicado no cambian.
+
 ## [2.4.1] - 2026-08-24
 
 ### Rendimiento
